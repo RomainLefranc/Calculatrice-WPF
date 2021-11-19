@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
-
+using System.IO;
 
 namespace Calculatrice
 {
@@ -22,109 +22,115 @@ namespace Calculatrice
     /// </summary>
     public partial class MainWindow : Window
     {
-        private decimal? nb1;
-        private decimal? nb2;
-        private string op;
-        private bool result = false;
-        private List<string> items = new List<string>();
+        private decimal? nombre1;
+        private decimal? nombre2;
+        private string operateur;
+        private bool inputEstUnResultat = false;
+        private List<string> historique = new List<string>();
+        public bool userIsRegistered = false;
        public MainWindow()
         {
             InitializeComponent();
-            // TODO :
-            // verifier que l'utilisateur est inscrit
-            // si non : l'utilisateur peut pas utiliser la caclulatrice
-            // si oui :
-            // verifier que la licence est toujours valide
-            // si oui : autoriser l'utilisateur a utiliser la calculatrice
-            // si non : supprimer la licence et l'utilisateur peut pas utiliser la caclulatrice
+
+            verifLicence();
+
         }
         // retour a la derniere operation
         private void Ce(object sender, RoutedEventArgs e)
         {
-            if (lastOp.Text.Contains("=")) {
-                lastOp.Text = null;
+            if (derniereOperation.Text.Contains("=")) {
+                derniereOperation.Text = null;
             }
             input.Text = null;
         }
         // reset de la calculatrice
         private void C(object sender, RoutedEventArgs e)
         {
-            lastOp.Text = null;
+            derniereOperation.Text = null;
             input.Text = null;
-            op = null;
-            nb1 = null;
-            nb2 = null;
-            items = null;
+            operateur = null;
+            nombre1 = null;
+            nombre2 = null;
+            historique = null;
             liste.ItemsSource = null;
         }
         // calcul de l'operation
         private void Calcul(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(op))
+            if (!string.IsNullOrEmpty(operateur))
             {
-                nb2 = decimal.Parse(input.Text);
-                lastOp.Text += nb2 + "=";
-                if (op == "+")
+                nombre2 = decimal.Parse(input.Text);
+                derniereOperation.Text += nombre2 + "=";
+                if (operateur == "+")
                 {
-                    input.Text = (nb1 + nb2).ToString();
+                    input.Text = (nombre1 + nombre2).ToString();
                 }
-                else if (op == "-")
+                else if (operateur == "-")
                 {
-                    input.Text = (nb1 - nb2).ToString();
+                    input.Text = (nombre1 - nombre2).ToString();
                 }
-                else if (op == "/")
+                else if (operateur == "/")
                 {
-                    input.Text = nb2 == 0 ? "Impossible de diviser par 0" : (nb1 / nb2).ToString();
+                    input.Text = nombre2 == 0 ? "Impossible de diviser par 0" : (nombre1 / nombre2).ToString();
                 }
-                else if (op == "*")
+                else if (operateur == "*")
                 {
-                    input.Text = (nb1 * nb2).ToString();
+                    input.Text = (nombre1 * nombre2).ToString();
                 }
-                result = true;
-                op = null;
-                nb1 = null;
-                nb2 = null;
-                items.Add(lastOp.Text + input.Text);
+                inputEstUnResultat = true;
+                operateur = null;
+                nombre1 = null;
+                nombre2 = null;
+                historique.Add(derniereOperation.Text + input.Text);
                 liste.ItemsSource = null;
-                liste.ItemsSource = items;
+                liste.ItemsSource = historique;
             }
         }
         // saisie
         private void Add(object sender, RoutedEventArgs e)
         {
             string content = (sender as Button).Content.ToString();
-            string[] operation = { "+", "-", "*", "/" };
-            if (operation.Contains(content))
+            string[] listeOperateur = { "+", "-", "*", "/" };
+            if (userIsRegistered)
             {
-                if (string.IsNullOrEmpty(op))
+                if (listeOperateur.Contains(content))
                 {
-                    GestionOp1(content);
+                    if (string.IsNullOrEmpty(operateur))
+                    {
+                        GestionNombre1(content);
+                    }
+                    else
+                    {
+                        GestionNombre2(content, sender, e);
+                    }
                 }
                 else
                 {
-                    GestionOp2(content, sender, e);
+                    if (inputEstUnResultat)
+                    {
+                        operateur = null;
+                        nombre1 = null;
+                        nombre2 = null;
+                        input.Text = content;
+                        derniereOperation.Text = null;
+                        inputEstUnResultat = false;
+                    }
+                    else
+                    {
+                        input.Text += content;
+                    }
                 }
             }
             else
             {
-                if (result) {
-                    op = null;
-                    op1 = null;
-                    op2 = null;
-                    input.Text = content;
-                    lastOp.Text = null;
-                    result = false;
-                }
-                else
-                {
-                    input.Text += content;
-                }
+                MessageBox.Show("Votre licence est invalide");
             }
+
         }
         // supprimer le dernier caractere saisie
         private void Retour(object sender, RoutedEventArgs e)
         {
-            if (input.Text != "" && !result)
+            if (input.Text != "" && !inputEstUnResultat)
             {
                 input.Text = input.Text.Substring(0, input.Text.Length - 1);
             }
@@ -140,14 +146,14 @@ namespace Calculatrice
         //
         private void GestionNombre1(string content)
         {
-            result = false;
+            inputEstUnResultat = false;
             if (string.IsNullOrEmpty(input.Text))
             {
                 input.Text = "0";
             }
-            op = content;
-            op1 = decimal.Parse(input.Text);
-            lastOp.Text = input.Text + content;
+            operateur = content;
+            nombre1 = decimal.Parse(input.Text);
+            derniereOperation.Text = input.Text + content;
             input.Text = null;
         }
 
@@ -156,8 +162,8 @@ namespace Calculatrice
             if (string.IsNullOrEmpty(input.Text))
             {
                 input.Text = null;
-                lastOp.Text = op1 + content;
-                op = content;
+                derniereOperation.Text = nombre1 + content;
+                operateur = content;
             }
             else
             {
@@ -183,5 +189,21 @@ namespace Calculatrice
         {
             historiqueView.Visibility = historiqueView.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
+
+        private void verifLicence()
+        {
+            var inputFileName = "licence.txt";
+            string fileContents;
+            using (StreamReader sr = File.OpenText(inputFileName))
+            {
+                fileContents = sr.ReadToEnd();
+            }
+            if (!string.IsNullOrEmpty(fileContents))
+            {
+                userIsRegistered = true;
+            }
+        }
     }
+
+    
 }

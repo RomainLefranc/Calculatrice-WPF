@@ -14,8 +14,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="1">E-mail:</Label>
-        <TextBox Grid.Column="1" Margin="0,0,0,38" />
-        <Button Content="S'inscrire" Click="Button_Click" Margin="51,28,97,3" Grid.Column="1" />
+        <Label Grid.Row="1">Licence :</Label>
+        <TextBox x:Name="licenceInput" Grid.Column="1" Margin="0,0,0,38" />
+        <Button Content="Enregistrer" Click="Button_Click" Margin="51,28,97,3" Grid.Column="1" />
     </Grid>
 </Window>

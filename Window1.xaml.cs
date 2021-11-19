@@ -9,6 +9,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Net.Http;
+using System.IO;
 
 namespace Calculatrice
 {
@@ -17,21 +19,41 @@ namespace Calculatrice
     /// </summary>
     public partial class Window1 : Window
     {
+        private static readonly HttpClient client = new HttpClient();
         public Window1()
         {
             InitializeComponent();
-
-            // TODO :
-            // verifier qu'il y a une licence en locale
-            // si oui : récuperer la licence dans un fichier locale
+            var inputFileName = "licence.txt";
+            string fileContents;
+            using (StreamReader sr = File.OpenText(inputFileName))
+            {
+                fileContents = sr.ReadToEnd();
+            }
+            licenceInput.Text = fileContents;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            // TODO :
-            // envoyer une requete vers l'api pour verifier si la licence est valide
-            // si oui : stocker la licence dans le fichier locale
-            // si non : message erreur
+            Dictionary<string, string> values = new Dictionary<string, string>
+            {
+                { "licence", licenceInput.Text },
+            };
+            FormUrlEncodedContent content = new FormUrlEncodedContent(values);
+
+            HttpResponseMessage response = await client.PostAsync("https://licence.free.beeceptor.com/verif", content);
+
+            string responseString = response.StatusCode.ToString();
+            if (responseString == "OK")
+            {
+                MessageBox.Show("Licence valide");
+                string fileName = "licence.txt";
+
+                using StreamWriter sw = File.CreateText(fileName);
+                sw.Write(licenceInput.Text);
+                ((MainWindow)Application.Current.MainWindow).userIsRegistered = true;
+                this.Close();
+            }
+
         }
     }
 }

@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         KeyDown="Window_KeyDown"
-        Title="Calculatrice" Height="550" Width="350">
+        Title="Calculatrice" Height="550" Width="350" HorizontalAlignment="Center" VerticalAlignment="Center" >
 
-    <Grid Background="#FFC9C7C7">
-        <Menu x:Name="menu" Margin="0,0,0,488">
+    <Grid Background="#FFC9C7C7" HorizontalAlignment="Center" VerticalAlignment="Top" Height="540">
+        <Menu x:Name="menu" Margin="0,1,0,517" Height="22" Width="350">
             <MenuItem Header="Licence" Height="22" Click="Licence"/>
             <MenuItem Header="Historique" Height="22" Click="Historique"/>
         </Menu>
@@ -37,10 +37,10 @@
         <Border BorderThickness="1" BorderBrush="Black" Margin="20,32,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="79" Width="295">
             <Grid Background="White">
                 <TextBox Text="" TextWrapping="Wrap" x:Name="input" IsReadOnly="True" Margin="0,39,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="293" BorderThickness="0,0,0,0"  Height="39" TextAlignment="Right" FontSize="24"/>
-                <TextBox Text="" TextWrapping="NoWrap" x:Name="lastOp" IsReadOnly="True" HorizontalAlignment="Center" VerticalAlignment="Top" Width="293" BorderThickness="0,0,0,0" Height="39" TextAlignment="Right" FontSize="24"/>
+                <TextBox Text="" TextWrapping="NoWrap" x:Name="derniereOperation" IsReadOnly="True" HorizontalAlignment="Center" VerticalAlignment="Top" Width="293" BorderThickness="0,0,0,0" Height="39" TextAlignment="Right" FontSize="24"/>
             </Grid>
         </Border>
-        <Grid x:Name="historiqueView" Margin="0,23,0,0" Visibility="Hidden" Background="White" >
+        <Grid x:Name="historiqueView" Margin="0,23,0,0" Visibility="Hidden" Background="White">
             <ListView Margin="10" Name="liste"/>
         </Grid>
     </Grid>
