@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calculatrice"
         mc:Ignorable="d"
-        Title="Inscription" Height="116" Width="300">
+        Title="Licence" Height="116" Width="300">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Grid.Row="1">Licence :</Label>
-        <TextBox x:Name="licenceInput" Grid.Column="1" Margin="0,0,0,38" />
+        <TextBox x:Name="licenceInput" Grid.Column="1" Margin="0,0,0,28" />
         <Button Content="Enregistrer" Click="Button_Click" Margin="51,28,97,3" Grid.Column="1" />
     </Grid>
 </Window>

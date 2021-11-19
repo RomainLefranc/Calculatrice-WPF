@@ -10,7 +10,7 @@
         Title="Calculatrice" Height="550" Width="350" HorizontalAlignment="Center" VerticalAlignment="Center" >
 
     <Grid Background="#FFC9C7C7" HorizontalAlignment="Center" VerticalAlignment="Top" Height="540">
-        <Menu x:Name="menu" Margin="0,1,0,517" Height="22" Width="350">
+        <Menu x:Name="menu" Margin="0,1,0,517" Height="22" Width="350" Visibility="Hidden">
             <MenuItem Header="Licence" Height="22" Click="Licence"/>
             <MenuItem Header="Historique" Height="22" Click="Historique"/>
         </Menu>

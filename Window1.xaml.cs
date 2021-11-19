@@ -20,10 +20,12 @@ namespace Calculatrice
     public partial class Window1 : Window
     {
         private static readonly HttpClient client = new HttpClient();
+
+        // Récuperer la licence et l'afficher
         public Window1()
         {
             InitializeComponent();
-            var inputFileName = "licence.txt";
+            string inputFileName = "licence.txt";
             string fileContents;
             using (StreamReader sr = File.OpenText(inputFileName))
             {
@@ -32,26 +34,33 @@ namespace Calculatrice
             licenceInput.Text = fileContents;
         }
 
+        // Verifier que la licence saisie est valide et la sauvegarder
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
+            //validation de la licence
+            if (string.IsNullOrEmpty(licenceInput.Text))
+            {
+                MessageBox.Show("Veuillez saisir une licence");
+                return;
+            }
             Dictionary<string, string> values = new Dictionary<string, string>
             {
                 { "licence", licenceInput.Text },
             };
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
-
             HttpResponseMessage response = await client.PostAsync("https://licence.free.beeceptor.com/verif", content);
-
-            string responseString = response.StatusCode.ToString();
-            if (responseString == "OK")
+            if (response.IsSuccessStatusCode)
             {
+                // Sauvegarde dans un fichier local
                 MessageBox.Show("Licence valide");
-                string fileName = "licence.txt";
-
-                using StreamWriter sw = File.CreateText(fileName);
+                using StreamWriter sw = File.CreateText("licence.txt");
                 sw.Write(licenceInput.Text);
                 ((MainWindow)Application.Current.MainWindow).userIsRegistered = true;
-                this.Close();
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Licence invalide");
             }
 
         }

@@ -28,14 +28,19 @@ namespace Calculatrice
         private bool inputEstUnResultat = false;
         private List<string> historique = new List<string>();
         public bool userIsRegistered = false;
-       public MainWindow()
+        public MainWindow()
         {
-            InitializeComponent();
 
-            verifLicence();
+            InitializeComponent();
+            if (!File.Exists("licence.txt"))
+            {
+                File.Create("licence.txt");
+            }
+            VerifLicence();
 
         }
-        // retour a la derniere operation
+
+        // Retourner a la derniere operation
         private void Ce(object sender, RoutedEventArgs e)
         {
             if (derniereOperation.Text.Contains("=")) {
@@ -43,7 +48,8 @@ namespace Calculatrice
             }
             input.Text = null;
         }
-        // reset de la calculatrice
+
+        // Reinitialiser la calculatrice
         private void C(object sender, RoutedEventArgs e)
         {
             derniereOperation.Text = null;
@@ -51,10 +57,12 @@ namespace Calculatrice
             operateur = null;
             nombre1 = null;
             nombre2 = null;
-            historique = null;
+            inputEstUnResultat = false;
+            historique = new List<string>();
             liste.ItemsSource = null;
         }
-        // calcul de l'operation
+
+        // Calcul de l'operation
         private void Calcul(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(operateur))
@@ -81,69 +89,70 @@ namespace Calculatrice
                 operateur = null;
                 nombre1 = null;
                 nombre2 = null;
+
+                //mis à jour de l'historique
                 historique.Add(derniereOperation.Text + input.Text);
                 liste.ItemsSource = null;
                 liste.ItemsSource = historique;
             }
         }
+
         // saisie
         private void Add(object sender, RoutedEventArgs e)
         {
             string content = (sender as Button).Content.ToString();
             string[] listeOperateur = { "+", "-", "*", "/" };
-            if (userIsRegistered)
+
+            if (listeOperateur.Contains(content))
             {
-                if (listeOperateur.Contains(content))
+                if (string.IsNullOrEmpty(operateur))
                 {
-                    if (string.IsNullOrEmpty(operateur))
-                    {
-                        GestionNombre1(content);
-                    }
-                    else
-                    {
-                        GestionNombre2(content, sender, e);
-                    }
+                    GestionNombre1(content);
                 }
                 else
                 {
-                    if (inputEstUnResultat)
-                    {
-                        operateur = null;
-                        nombre1 = null;
-                        nombre2 = null;
-                        input.Text = content;
-                        derniereOperation.Text = null;
-                        inputEstUnResultat = false;
-                    }
-                    else
-                    {
-                        input.Text += content;
-                    }
+                    GestionNombre2(content, sender, e);
                 }
             }
             else
             {
-                MessageBox.Show("Votre licence est invalide");
+                if (inputEstUnResultat)
+                {
+                    operateur = null;
+                    nombre1 = null;
+                    nombre2 = null;
+                    input.Text = content;
+                    derniereOperation.Text = null;
+                    inputEstUnResultat = false;
+                }
+                else
+                {
+                    input.Text += content;
+                }
             }
 
+
         }
-        // supprimer le dernier caractere saisie
+
+        // Supprimer le dernier caractere saisie
         private void Retour(object sender, RoutedEventArgs e)
         {
-            if (input.Text != "" && !inputEstUnResultat)
+            if (!string.IsNullOrEmpty(input.Text) && !inputEstUnResultat)
             {
                 input.Text = input.Text.Substring(0, input.Text.Length - 1);
             }
         }
-        // opposé du nombre saisie
+
+        // Opposé du nombre saisie
         private void Negate(object sender, RoutedEventArgs e)
         {
-            if (input.Text != "")
+            if (!string.IsNullOrEmpty(input.Text))
             {
                 input.Text = (decimal.Parse(input.Text) * -1).ToString();
             }
         }
-        //
+
+        // Récuperer le nombre 1
         private void GestionNombre1(string content)
         {
             inputEstUnResultat = false;
@@ -157,6 +166,7 @@ namespace Calculatrice
             input.Text = null;
         }
 
+        // Récuperer le nombre 2
         private void GestionNombre2(string content, object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(input.Text))
@@ -171,6 +181,7 @@ namespace Calculatrice
             }
         }
 
+        // Afficher/Masquer le menu avec Alt Gr
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.RightAlt)
@@ -179,22 +190,24 @@ namespace Calculatrice
             }
         }
 
+        // Afficher de la fenetre licence
         private void Licence(object sender, RoutedEventArgs e)
         {
             Window1 p = new Window1();
             p.ShowDialog();
         }
 
+        // Afficher de l'historique
         private void Historique(object sender, RoutedEventArgs e)
         {
             historiqueView.Visibility = historiqueView.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
 
-        private void verifLicence()
+        // Verifier de la licence de l'utilisateur
+        private void VerifLicence()
         {
-            var inputFileName = "licence.txt";
             string fileContents;
-            using (StreamReader sr = File.OpenText(inputFileName))
+            using (StreamReader sr = File.OpenText("licence.txt"))
             {
                 fileContents = sr.ReadToEnd();
             }
